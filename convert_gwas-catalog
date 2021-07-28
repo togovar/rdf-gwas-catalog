@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+
+# 
+
+FORCE_CONVERT=0
+
+# オプション解析
+# f アーカイブファイルに更新がなくてもコンバートを実行する
+while getopts f OPT
+do
+  case $OPT in
+    f)  FORCE_CONVERT=1
+        ;;
+  esac
+done
+shift  $(($OPTIND - 1))
+
+# ファイルのロード
+cd /work
+now=`date "+%Y%m%d-%H%M%S"`
+echo "Started wget at $now"
+
+wget -N http://ftp.ebi.ac.uk/pub/databases/gwas/releases/latest/gwas-catalog-studies_ontology-annotated.tsv 2> /wget.log
+wget -N http://ftp.ebi.ac.uk/pub/databases/gwas/releases/latest/gwas-catalog-associations_ontology-annotated.tsv 2>> /wget.log
+chmod 777 gwas-catalog-studies_ontology-annotated.tsv gwas-catalog-associations_ontology-annotated.tsv
+
+
+now=`date "+%Y%m%d-%H%M%S"`
+echo "Finished wget at $now"
+
+cat /wget.log
+num_of_newfiles=`egrep " saved \[[0-9]+/[0-9]+\]" /wget.log | grep -v "'.listing' saved" | wc -l `
+
+# アーカイブファイルに更新がない、かつ fオプションが指定されていなければ正常終了
+if [ $num_of_newfiles -eq 0 ] && [ $FORCE_CONVERT -eq 0 ]; then
+  echo
+  echo "No RDF files were generated because no new files were found at the download site."
+  exit 0
+fi
+
+# コンバートの実行
+cd /data
+
+now=`date "+%Y%m%d-%H%M%S"`
+echo "Started convert at $now"
+
+ruby /rdf_converter_gwascatalog_studies/rdf_converter_gwas_catalog_studies.rb /work/gwas-catalog-studies_ontology-annotated.tsv > studies.ttl
+ruby /rdf_converter_gwascatalog/rdf_converter_gwascatalog.rb -p -a /work/gwas-catalog-associations_ontology-annotated.tsv > associations.ttl
+chmod 777 studies.ttl associations.ttl
+
+now=`date "+%Y%m%d-%H%M%S"`
+echo "Finished convert at $now"
+
+
+
