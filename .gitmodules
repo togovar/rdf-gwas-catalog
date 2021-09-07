@@ -1,6 +1,3 @@
 [submodule "rdf_converter_gwascatalog"]
 	path = rdf_converter_gwascatalog
 	url = https://github.com/skwsm/rdf_converter_gwascatalog.git
-[submodule "rdf_converter_gwascatalog_studies"]
-	path = rdf_converter_gwascatalog_studies
-	url = https://github.com/skwsm/rdf_converter_gwascatalog_studies.git

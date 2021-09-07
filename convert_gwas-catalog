@@ -44,7 +44,7 @@ cd /data
 now=`date "+%Y%m%d-%H%M%S"`
 echo "Started convert at $now"
 
-ruby /rdf_converter_gwascatalog_studies/rdf_converter_gwas_catalog_studies.rb /work/gwas-catalog-studies_ontology-annotated.tsv > studies.ttl
+ruby /rdf_converter_gwascatalog/rdf_converter_gwascatalog.rb -p -s /work/gwas-catalog-studies_ontology-annotated.tsv > studies.ttl
 ruby /rdf_converter_gwascatalog/rdf_converter_gwascatalog.rb -p -a /work/gwas-catalog-associations_ontology-annotated.tsv > associations.ttl
 chmod 777 studies.ttl associations.ttl
 
